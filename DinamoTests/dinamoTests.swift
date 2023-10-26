@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import kombi
+@testable import Dinamo
 
 class kombiTests: XCTestCase {
     
