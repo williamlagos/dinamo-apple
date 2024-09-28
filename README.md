@@ -1,2 +1,2 @@
-# apple-boilerplate
-Apple app written with Swift, to start with
+# apple-game-boilerplate
+Apple game app written with Swift, to start with
