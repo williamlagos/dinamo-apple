@@ -6,21 +6,6 @@
 	objectVersion = 50;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		3D6680EB211B9BFC0026A004 /* MealTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6680E9211B9BFC0026A004 /* MealTableViewController.swift */; };
-		3D6680EC211B9BFC0026A004 /* MealTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3D6680EA211B9BFC0026A004 /* MealTableViewController.xib */; };
-		3D829E3B21138E8300B571D2 /* Meal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D829E3A21138E8300B571D2 /* Meal.swift */; };
-		3D829E3D211397AC00B571D2 /* MealTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D829E3C211397AC00B571D2 /* MealTableViewCell.swift */; };
-		3D8ACDBE211248FB001303E9 /* RatingControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8ACDBD211248FB001303E9 /* RatingControl.swift */; };
-		3D9733F1210C27160096EF1F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D9733F0210C27160096EF1F /* AppDelegate.swift */; };
-		3D9733F3210C27160096EF1F /* MealViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D9733F2210C27160096EF1F /* MealViewController.swift */; };
-		3D9733F6210C27160096EF1F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D9733F4210C27160096EF1F /* Main.storyboard */; };
-		3D9733F8210C27180096EF1F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D9733F7210C27180096EF1F /* Assets.xcassets */; };
-		3D9733FB210C27180096EF1F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D9733F9210C27180096EF1F /* LaunchScreen.storyboard */; };
-		3D973406210C27190096EF1F /* dinamoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D973405210C27190096EF1F /* dinamoTests.swift */; };
-		3D973411210C27190096EF1F /* dinamoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D973410210C27190096EF1F /* dinamoUITests.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		3D973402210C27190096EF1F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -39,24 +24,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3D6680E9211B9BFC0026A004 /* MealTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealTableViewController.swift; sourceTree = "<group>"; };
-		3D6680EA211B9BFC0026A004 /* MealTableViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MealTableViewController.xib; sourceTree = "<group>"; };
-		3D829E3A21138E8300B571D2 /* Meal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meal.swift; sourceTree = "<group>"; };
-		3D829E3C211397AC00B571D2 /* MealTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealTableViewCell.swift; sourceTree = "<group>"; };
-		3D8ACDBD211248FB001303E9 /* RatingControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingControl.swift; sourceTree = "<group>"; };
 		3D9733ED210C27160096EF1F /* Dinamo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dinamo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3D9733F0210C27160096EF1F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		3D9733F2210C27160096EF1F /* MealViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealViewController.swift; sourceTree = "<group>"; };
-		3D9733F5210C27160096EF1F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		3D9733F7210C27180096EF1F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		3D9733FA210C27180096EF1F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		3D9733FC210C27180096EF1F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3D973401210C27190096EF1F /* DinamoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DinamoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		3D973405210C27190096EF1F /* dinamoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dinamoTests.swift; sourceTree = "<group>"; };
-		3D973407210C27190096EF1F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3D97340C210C27190096EF1F /* DinamoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DinamoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		3D973410210C27190096EF1F /* dinamoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dinamoUITests.swift; sourceTree = "<group>"; };
-		3D973412210C27190096EF1F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,9 +57,6 @@
 		3D9733E4210C27150096EF1F = {
 			isa = PBXGroup;
 			children = (
-				3D9733EF210C27160096EF1F /* Dinamo */,
-				3D973404210C27190096EF1F /* DinamoTests */,
-				3D97340F210C27190096EF1F /* DinamoUITests */,
 				3D9733EE210C27160096EF1F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -102,42 +69,6 @@
 				3D97340C210C27190096EF1F /* DinamoUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		3D9733EF210C27160096EF1F /* Dinamo */ = {
-			isa = PBXGroup;
-			children = (
-				3D9733F0210C27160096EF1F /* AppDelegate.swift */,
-				3D9733F2210C27160096EF1F /* MealViewController.swift */,
-				3D8ACDBD211248FB001303E9 /* RatingControl.swift */,
-				3D9733F4210C27160096EF1F /* Main.storyboard */,
-				3D829E3C211397AC00B571D2 /* MealTableViewCell.swift */,
-				3D829E3A21138E8300B571D2 /* Meal.swift */,
-				3D6680E9211B9BFC0026A004 /* MealTableViewController.swift */,
-				3D6680EA211B9BFC0026A004 /* MealTableViewController.xib */,
-				3D9733F7210C27180096EF1F /* Assets.xcassets */,
-				3D9733F9210C27180096EF1F /* LaunchScreen.storyboard */,
-				3D9733FC210C27180096EF1F /* Info.plist */,
-			);
-			path = Dinamo;
-			sourceTree = "<group>";
-		};
-		3D973404210C27190096EF1F /* DinamoTests */ = {
-			isa = PBXGroup;
-			children = (
-				3D973405210C27190096EF1F /* dinamoTests.swift */,
-				3D973407210C27190096EF1F /* Info.plist */,
-			);
-			path = DinamoTests;
-			sourceTree = "<group>";
-		};
-		3D97340F210C27190096EF1F /* DinamoUITests */ = {
-			isa = PBXGroup;
-			children = (
-				3D973410210C27190096EF1F /* dinamoUITests.swift */,
-				3D973412210C27190096EF1F /* Info.plist */,
-			);
-			path = DinamoUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -244,10 +175,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D9733FB210C27180096EF1F /* LaunchScreen.storyboard in Resources */,
-				3D9733F8210C27180096EF1F /* Assets.xcassets in Resources */,
-				3D6680EC211B9BFC0026A004 /* MealTableViewController.xib in Resources */,
-				3D9733F6210C27160096EF1F /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -272,12 +199,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D829E3B21138E8300B571D2 /* Meal.swift in Sources */,
-				3D9733F3210C27160096EF1F /* MealViewController.swift in Sources */,
-				3D8ACDBE211248FB001303E9 /* RatingControl.swift in Sources */,
-				3D9733F1210C27160096EF1F /* AppDelegate.swift in Sources */,
-				3D6680EB211B9BFC0026A004 /* MealTableViewController.swift in Sources */,
-				3D829E3D211397AC00B571D2 /* MealTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,7 +206,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D973406210C27190096EF1F /* dinamoTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,7 +213,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D973411210C27190096EF1F /* dinamoUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,25 +230,6 @@
 			targetProxy = 3D97340D210C27190096EF1F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		3D9733F4210C27160096EF1F /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				3D9733F5210C27160096EF1F /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		3D9733F9210C27180096EF1F /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				3D9733FA210C27180096EF1F /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		3D973413210C27190096EF1F /* Debug */ = {
@@ -451,13 +351,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CY492ZD5PH;
+				DEVELOPMENT_TEAM = HCK79539MA;
 				INFOPLIST_FILE = "$(SRCROOT)/FoodTracker/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.williamlagos.foodtracker;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.williamlagos.foodtracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -469,13 +369,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CY492ZD5PH;
+				DEVELOPMENT_TEAM = HCK79539MA;
 				INFOPLIST_FILE = "$(SRCROOT)/FoodTracker/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.williamlagos.foodtracker;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.williamlagos.foodtracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -485,7 +385,6 @@
 		3D973419210C27190096EF1F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = CY492ZD5PH;
@@ -506,7 +405,6 @@
 		3D97341A210C27190096EF1F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = CY492ZD5PH;
@@ -527,7 +425,6 @@
 		3D97341C210C27190096EF1F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = CY492ZD5PH;
 				INFOPLIST_FILE = kombiUITests/Info.plist;
@@ -547,7 +444,6 @@
 		3D97341D210C27190096EF1F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = CY492ZD5PH;
 				INFOPLIST_FILE = kombiUITests/Info.plist;
