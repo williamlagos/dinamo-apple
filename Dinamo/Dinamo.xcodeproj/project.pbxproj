@@ -7,90 +7,66 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		3DFC91812CA8645900386A02 /* Dinamo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dinamo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3DFC91922CA8645900386A02 /* Dinamo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dinamo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3DFC91A22CA8645900386A02 /* Dinamo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dinamo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D3BD0662CE7559C00B6AC9B /* Dinamo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dinamo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D3BD0772CE7559C00B6AC9B /* Dinamo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dinamo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D3BD0872CE7559C00B6AC9B /* Dinamo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dinamo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3DFC91B82CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Dinamo iOS" target */ = {
+		3D3BD09D2CE7559C00B6AC9B /* Exceptions for "Dinamo Shared" folder in "Dinamo iOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Actions.sks,
 				Assets.xcassets,
-				Renderer.swift,
-				Shaders.metal,
+				GameScene.sks,
+				GameScene.swift,
 			);
-			target = 3DFC91802CA8645900386A02 /* Dinamo iOS */;
+			target = 3D3BD0652CE7559C00B6AC9B /* Dinamo iOS */;
 		};
-		3DFC91BD2CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Dinamo tvOS" target */ = {
+		3D3BD0A12CE7559C00B6AC9B /* Exceptions for "Dinamo Shared" folder in "Dinamo tvOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Actions.sks,
 				Assets.xcassets,
-				Renderer.swift,
-				Shaders.metal,
+				GameScene.sks,
+				GameScene.swift,
 			);
-			target = 3DFC91912CA8645900386A02 /* Dinamo tvOS */;
+			target = 3D3BD0762CE7559C00B6AC9B /* Dinamo tvOS */;
 		};
-		3DFC91C22CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Dinamo macOS" target */ = {
+		3D3BD0A52CE7559C00B6AC9B /* Exceptions for "Dinamo Shared" folder in "Dinamo macOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Actions.sks,
 				Assets.xcassets,
-				Renderer.swift,
-				Shaders.metal,
+				GameScene.sks,
+				GameScene.swift,
 			);
-			target = 3DFC91A12CA8645900386A02 /* Dinamo macOS */;
+			target = 3D3BD0862CE7559C00B6AC9B /* Dinamo macOS */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		3DFC91BC2CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Copy Bundle Resources" phase from "Dinamo iOS" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 3DFC917F2CA8645900386A02 /* Resources */;
-			membershipExceptions = (
-				ShaderTypes.h,
-			);
-		};
-		3DFC91C12CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Copy Bundle Resources" phase from "Dinamo tvOS" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 3DFC91902CA8645900386A02 /* Resources */;
-			membershipExceptions = (
-				ShaderTypes.h,
-			);
-		};
-		3DFC91C62CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Copy Bundle Resources" phase from "Dinamo macOS" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 3DFC91A02CA8645900386A02 /* Resources */;
-			membershipExceptions = (
-				ShaderTypes.h,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		3DFC91782CA8645800386A02 /* Dinamo Shared */ = {
+		3D3BD05D2CE7559A00B6AC9B /* Dinamo Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				3DFC91B82CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Dinamo iOS" target */,
-				3DFC91BC2CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Copy Bundle Resources" phase from "Dinamo iOS" target */,
-				3DFC91BD2CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Dinamo tvOS" target */,
-				3DFC91C12CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Copy Bundle Resources" phase from "Dinamo tvOS" target */,
-				3DFC91C22CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Dinamo macOS" target */,
-				3DFC91C62CA8645900386A02 /* Exceptions for "Dinamo Shared" folder in "Copy Bundle Resources" phase from "Dinamo macOS" target */,
+				3D3BD09D2CE7559C00B6AC9B /* Exceptions for "Dinamo Shared" folder in "Dinamo iOS" target */,
+				3D3BD0A12CE7559C00B6AC9B /* Exceptions for "Dinamo Shared" folder in "Dinamo tvOS" target */,
+				3D3BD0A52CE7559C00B6AC9B /* Exceptions for "Dinamo Shared" folder in "Dinamo macOS" target */,
 			);
 			path = "Dinamo Shared";
 			sourceTree = "<group>";
 		};
-		3DFC91832CA8645900386A02 /* Dinamo iOS */ = {
+		3D3BD0682CE7559C00B6AC9B /* Dinamo iOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Dinamo iOS";
 			sourceTree = "<group>";
 		};
-		3DFC91932CA8645900386A02 /* Dinamo tvOS */ = {
+		3D3BD0782CE7559C00B6AC9B /* Dinamo tvOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Dinamo tvOS";
 			sourceTree = "<group>";
 		};
-		3DFC91A32CA8645900386A02 /* Dinamo macOS */ = {
+		3D3BD0882CE7559C00B6AC9B /* Dinamo macOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Dinamo macOS";
 			sourceTree = "<group>";
@@ -98,21 +74,21 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		3DFC917E2CA8645900386A02 /* Frameworks */ = {
+		3D3BD0632CE7559C00B6AC9B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3DFC918F2CA8645900386A02 /* Frameworks */ = {
+		3D3BD0742CE7559C00B6AC9B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3DFC919F2CA8645900386A02 /* Frameworks */ = {
+		3D3BD0842CE7559C00B6AC9B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,23 +98,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3DFC91732CA8645800386A02 = {
+		3D3BD0582CE7559A00B6AC9B = {
 			isa = PBXGroup;
 			children = (
-				3DFC91782CA8645800386A02 /* Dinamo Shared */,
-				3DFC91832CA8645900386A02 /* Dinamo iOS */,
-				3DFC91932CA8645900386A02 /* Dinamo tvOS */,
-				3DFC91A32CA8645900386A02 /* Dinamo macOS */,
-				3DFC91822CA8645900386A02 /* Products */,
+				3D3BD05D2CE7559A00B6AC9B /* Dinamo Shared */,
+				3D3BD0682CE7559C00B6AC9B /* Dinamo iOS */,
+				3D3BD0782CE7559C00B6AC9B /* Dinamo tvOS */,
+				3D3BD0882CE7559C00B6AC9B /* Dinamo macOS */,
+				3D3BD0672CE7559C00B6AC9B /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		3DFC91822CA8645900386A02 /* Products */ = {
+		3D3BD0672CE7559C00B6AC9B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3DFC91812CA8645900386A02 /* Dinamo.app */,
-				3DFC91922CA8645900386A02 /* Dinamo.app */,
-				3DFC91A22CA8645900386A02 /* Dinamo.app */,
+				3D3BD0662CE7559C00B6AC9B /* Dinamo.app */,
+				3D3BD0772CE7559C00B6AC9B /* Dinamo.app */,
+				3D3BD0872CE7559C00B6AC9B /* Dinamo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -146,130 +122,130 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3DFC91802CA8645900386A02 /* Dinamo iOS */ = {
+		3D3BD0652CE7559C00B6AC9B /* Dinamo iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3DFC91B92CA8645900386A02 /* Build configuration list for PBXNativeTarget "Dinamo iOS" */;
+			buildConfigurationList = 3D3BD09E2CE7559C00B6AC9B /* Build configuration list for PBXNativeTarget "Dinamo iOS" */;
 			buildPhases = (
-				3DFC917D2CA8645900386A02 /* Sources */,
-				3DFC917E2CA8645900386A02 /* Frameworks */,
-				3DFC917F2CA8645900386A02 /* Resources */,
+				3D3BD0622CE7559C00B6AC9B /* Sources */,
+				3D3BD0632CE7559C00B6AC9B /* Frameworks */,
+				3D3BD0642CE7559C00B6AC9B /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				3DFC91832CA8645900386A02 /* Dinamo iOS */,
+				3D3BD0682CE7559C00B6AC9B /* Dinamo iOS */,
 			);
 			name = "Dinamo iOS";
 			packageProductDependencies = (
 			);
 			productName = "Dinamo iOS";
-			productReference = 3DFC91812CA8645900386A02 /* Dinamo.app */;
+			productReference = 3D3BD0662CE7559C00B6AC9B /* Dinamo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3DFC91912CA8645900386A02 /* Dinamo tvOS */ = {
+		3D3BD0762CE7559C00B6AC9B /* Dinamo tvOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3DFC91BE2CA8645900386A02 /* Build configuration list for PBXNativeTarget "Dinamo tvOS" */;
+			buildConfigurationList = 3D3BD0A22CE7559C00B6AC9B /* Build configuration list for PBXNativeTarget "Dinamo tvOS" */;
 			buildPhases = (
-				3DFC918E2CA8645900386A02 /* Sources */,
-				3DFC918F2CA8645900386A02 /* Frameworks */,
-				3DFC91902CA8645900386A02 /* Resources */,
+				3D3BD0732CE7559C00B6AC9B /* Sources */,
+				3D3BD0742CE7559C00B6AC9B /* Frameworks */,
+				3D3BD0752CE7559C00B6AC9B /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				3DFC91932CA8645900386A02 /* Dinamo tvOS */,
+				3D3BD0782CE7559C00B6AC9B /* Dinamo tvOS */,
 			);
 			name = "Dinamo tvOS";
 			packageProductDependencies = (
 			);
 			productName = "Dinamo tvOS";
-			productReference = 3DFC91922CA8645900386A02 /* Dinamo.app */;
+			productReference = 3D3BD0772CE7559C00B6AC9B /* Dinamo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3DFC91A12CA8645900386A02 /* Dinamo macOS */ = {
+		3D3BD0862CE7559C00B6AC9B /* Dinamo macOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3DFC91C32CA8645900386A02 /* Build configuration list for PBXNativeTarget "Dinamo macOS" */;
+			buildConfigurationList = 3D3BD0A62CE7559C00B6AC9B /* Build configuration list for PBXNativeTarget "Dinamo macOS" */;
 			buildPhases = (
-				3DFC919E2CA8645900386A02 /* Sources */,
-				3DFC919F2CA8645900386A02 /* Frameworks */,
-				3DFC91A02CA8645900386A02 /* Resources */,
+				3D3BD0832CE7559C00B6AC9B /* Sources */,
+				3D3BD0842CE7559C00B6AC9B /* Frameworks */,
+				3D3BD0852CE7559C00B6AC9B /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				3DFC91A32CA8645900386A02 /* Dinamo macOS */,
+				3D3BD0882CE7559C00B6AC9B /* Dinamo macOS */,
 			);
 			name = "Dinamo macOS";
 			packageProductDependencies = (
 			);
 			productName = "Dinamo macOS";
-			productReference = 3DFC91A22CA8645900386A02 /* Dinamo.app */;
+			productReference = 3D3BD0872CE7559C00B6AC9B /* Dinamo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		3DFC91742CA8645800386A02 /* Project object */ = {
+		3D3BD0592CE7559A00B6AC9B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1600;
+				LastSwiftUpdateCheck = 1610;
+				LastUpgradeCheck = 1610;
 				TargetAttributes = {
-					3DFC91802CA8645900386A02 = {
-						CreatedOnToolsVersion = 16.0;
+					3D3BD0652CE7559C00B6AC9B = {
+						CreatedOnToolsVersion = 16.1;
 					};
-					3DFC91912CA8645900386A02 = {
-						CreatedOnToolsVersion = 16.0;
+					3D3BD0762CE7559C00B6AC9B = {
+						CreatedOnToolsVersion = 16.1;
 					};
-					3DFC91A12CA8645900386A02 = {
-						CreatedOnToolsVersion = 16.0;
+					3D3BD0862CE7559C00B6AC9B = {
+						CreatedOnToolsVersion = 16.1;
 					};
 				};
 			};
-			buildConfigurationList = 3DFC91772CA8645800386A02 /* Build configuration list for PBXProject "Dinamo" */;
+			buildConfigurationList = 3D3BD05C2CE7559A00B6AC9B /* Build configuration list for PBXProject "Dinamo" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 3DFC91732CA8645800386A02;
+			mainGroup = 3D3BD0582CE7559A00B6AC9B;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 3DFC91822CA8645900386A02 /* Products */;
+			productRefGroup = 3D3BD0672CE7559C00B6AC9B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3DFC91802CA8645900386A02 /* Dinamo iOS */,
-				3DFC91912CA8645900386A02 /* Dinamo tvOS */,
-				3DFC91A12CA8645900386A02 /* Dinamo macOS */,
+				3D3BD0652CE7559C00B6AC9B /* Dinamo iOS */,
+				3D3BD0762CE7559C00B6AC9B /* Dinamo tvOS */,
+				3D3BD0862CE7559C00B6AC9B /* Dinamo macOS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		3DFC917F2CA8645900386A02 /* Resources */ = {
+		3D3BD0642CE7559C00B6AC9B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3DFC91902CA8645900386A02 /* Resources */ = {
+		3D3BD0752CE7559C00B6AC9B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3DFC91A02CA8645900386A02 /* Resources */ = {
+		3D3BD0852CE7559C00B6AC9B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -279,21 +255,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		3DFC917D2CA8645900386A02 /* Sources */ = {
+		3D3BD0622CE7559C00B6AC9B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3DFC918E2CA8645900386A02 /* Sources */ = {
+		3D3BD0732CE7559C00B6AC9B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3DFC919E2CA8645900386A02 /* Sources */ = {
+		3D3BD0832CE7559C00B6AC9B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -303,7 +279,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		3DFC91BA2CA8645900386A02 /* Debug */ = {
+		3D3BD09F2CE7559C00B6AC9B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -318,7 +294,7 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -328,13 +304,12 @@
 				PRODUCT_NAME = Dinamo;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Dinamo Shared/ShaderTypes.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		3DFC91BB2CA8645900386A02 /* Release */ = {
+		3D3BD0A02CE7559C00B6AC9B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -349,7 +324,7 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -359,14 +334,13 @@
 				PRODUCT_NAME = Dinamo;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Dinamo Shared/ShaderTypes.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		3DFC91BF2CA8645900386A02 /* Debug */ = {
+		3D3BD0A32CE7559C00B6AC9B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "tvOS App Icon & Top Shelf Image";
@@ -387,14 +361,13 @@
 				PRODUCT_NAME = Dinamo;
 				SDKROOT = appletvos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Dinamo Shared/ShaderTypes.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 18.0;
+				TVOS_DEPLOYMENT_TARGET = 18.1;
 			};
 			name = Debug;
 		};
-		3DFC91C02CA8645900386A02 /* Release */ = {
+		3D3BD0A42CE7559C00B6AC9B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "tvOS App Icon & Top Shelf Image";
@@ -415,15 +388,14 @@
 				PRODUCT_NAME = Dinamo;
 				SDKROOT = appletvos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Dinamo Shared/ShaderTypes.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 18.0;
+				TVOS_DEPLOYMENT_TARGET = 18.1;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		3DFC91C42CA8645900386A02 /* Debug */ = {
+		3D3BD0A72CE7559C00B6AC9B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -448,12 +420,11 @@
 				PRODUCT_NAME = Dinamo;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Dinamo Shared/ShaderTypes.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
-		3DFC91C52CA8645900386A02 /* Release */ = {
+		3D3BD0A82CE7559C00B6AC9B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -478,12 +449,11 @@
 				PRODUCT_NAME = Dinamo;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Dinamo Shared/ShaderTypes.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
-		3DFC91C72CA8645900386A02 /* Debug */ = {
+		3D3BD0A92CE7559C00B6AC9B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -544,7 +514,7 @@
 			};
 			name = Debug;
 		};
-		3DFC91C82CA8645900386A02 /* Release */ = {
+		3D3BD0AA2CE7559C00B6AC9B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -600,43 +570,43 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3DFC91772CA8645800386A02 /* Build configuration list for PBXProject "Dinamo" */ = {
+		3D3BD05C2CE7559A00B6AC9B /* Build configuration list for PBXProject "Dinamo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3DFC91C72CA8645900386A02 /* Debug */,
-				3DFC91C82CA8645900386A02 /* Release */,
+				3D3BD0A92CE7559C00B6AC9B /* Debug */,
+				3D3BD0AA2CE7559C00B6AC9B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3DFC91B92CA8645900386A02 /* Build configuration list for PBXNativeTarget "Dinamo iOS" */ = {
+		3D3BD09E2CE7559C00B6AC9B /* Build configuration list for PBXNativeTarget "Dinamo iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3DFC91BA2CA8645900386A02 /* Debug */,
-				3DFC91BB2CA8645900386A02 /* Release */,
+				3D3BD09F2CE7559C00B6AC9B /* Debug */,
+				3D3BD0A02CE7559C00B6AC9B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3DFC91BE2CA8645900386A02 /* Build configuration list for PBXNativeTarget "Dinamo tvOS" */ = {
+		3D3BD0A22CE7559C00B6AC9B /* Build configuration list for PBXNativeTarget "Dinamo tvOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3DFC91BF2CA8645900386A02 /* Debug */,
-				3DFC91C02CA8645900386A02 /* Release */,
+				3D3BD0A32CE7559C00B6AC9B /* Debug */,
+				3D3BD0A42CE7559C00B6AC9B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3DFC91C32CA8645900386A02 /* Build configuration list for PBXNativeTarget "Dinamo macOS" */ = {
+		3D3BD0A62CE7559C00B6AC9B /* Build configuration list for PBXNativeTarget "Dinamo macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3DFC91C42CA8645900386A02 /* Debug */,
-				3DFC91C52CA8645900386A02 /* Release */,
+				3D3BD0A72CE7559C00B6AC9B /* Debug */,
+				3D3BD0A82CE7559C00B6AC9B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 3DFC91742CA8645800386A02 /* Project object */;
+	rootObject = 3D3BD0592CE7559A00B6AC9B /* Project object */;
 }

@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  Dinamo tvOS
 //
-//  Created by William Oliveira de Lagos on 28.09.24.
+//  Created by William Oliveira de Lagos on 15.11.24.
 //
 
 import UIKit
