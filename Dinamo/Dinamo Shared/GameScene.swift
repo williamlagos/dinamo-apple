@@ -9,117 +9,115 @@ import SpriteKit
 
 class GameScene: SKScene {
     
-    
-    fileprivate var label : SKLabelNode?
-    fileprivate var spinnyNode : SKShapeNode?
+    var player: SKSpriteNode!
+    var scoreLabel: SKLabelNode!
+    var score = 0
 
-    
-    class func newGameScene() -> GameScene {
-        // Load 'GameScene.sks' as an SKScene.
-        guard let scene = SKScene(fileNamed: "GameScene") as? GameScene else {
-            print("Failed to load GameScene.sks")
-            abort()
-        }
-        
-        // Set the scale mode to scale to fit the window
-        scene.scaleMode = .aspectFill
-        
-        return scene
-    }
-    
-    func setUpScene() {
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
-        }
-        
-        // Create shape node to use during mouse interaction
-        let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
-        
-        if let spinnyNode = self.spinnyNode {
-            spinnyNode.lineWidth = 4.0
-            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-                                              SKAction.fadeOut(withDuration: 0.5),
-                                              SKAction.removeFromParent()]))
-        }
-    }
-    
     override func didMove(to view: SKView) {
-        self.setUpScene()
+       backgroundColor = .blue
+
+       // Add player
+       player = SKSpriteNode(color: .red, size: CGSize(width: 50, height: 50))
+       player.position = CGPoint(x: size.width / 2, y: 100)
+       addChild(player)
+
+       // Add score label
+       scoreLabel = SKLabelNode(fontNamed: "Chalkduster")
+       scoreLabel.text = "Score: 0"
+       scoreLabel.fontSize = 24
+       scoreLabel.fontColor = .white
+       scoreLabel.position = CGPoint(x: size.width / 2, y: size.height - 50)
+       addChild(scoreLabel)
+
+       // Start spawning obstacles
+       run(SKAction.repeatForever(SKAction.sequence([
+           SKAction.run(spawnObstacle),
+           SKAction.wait(forDuration: 1.0)
+       ])))
     }
 
-    func makeSpinny(at pos: CGPoint, color: SKColor) {
-        if let spinny = self.spinnyNode?.copy() as! SKShapeNode? {
-            spinny.position = pos
-            spinny.strokeColor = color
-            self.addChild(spinny)
-        }
+    func spawnObstacle() {
+       let obstacle = SKSpriteNode(color: .black, size: CGSize(width: 30, height: 30))
+       obstacle.position = CGPoint(x: CGFloat.random(in: 0...size.width), y: size.height)
+       addChild(obstacle)
+
+       let moveDown = SKAction.moveBy(x: 0, y: -size.height, duration: 5.0)
+       let remove = SKAction.removeFromParent()
+       obstacle.run(SKAction.sequence([moveDown, remove]))
     }
-    
+
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+       for node in children {
+           if node != player && node != scoreLabel && player.frame.intersects(node.frame) {
+               gameOver()
+           }
+       }
+    }
+
+    func gameOver() {
+       isPaused = true
+       scoreLabel.text = "Game Over! Score: \(score)"
     }
 }
 
 #if os(iOS) || os(tvOS)
+enum SwipeDirection {
+    case left
+    case right
+}
+
 // Touch-based event handling
 extension GameScene {
-
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let label = self.label {
-            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
-        }
-        
-        for t in touches {
-            self.makeSpinny(at: t.location(in: self), color: SKColor.green)
-        }
-    }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches {
-            self.makeSpinny(at: t.location(in: self), color: SKColor.blue)
+        if let touch = touches.first {
+            let location = touch.location(in: self)
+            player.position.x = location.x
         }
     }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches {
-            self.makeSpinny(at: t.location(in: self), color: SKColor.red)
+
+    func handleSwipe(direction: SwipeDirection) {
+        switch direction {
+        case .left:
+            player.position.x -= 50
+        case .right:
+            player.position.x += 50
         }
     }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches {
-            self.makeSpinny(at: t.location(in: self), color: SKColor.red)
-        }
-    }
-    
-   
 }
 #endif
 
 #if os(OSX)
 // Mouse-based event handling
 extension GameScene {
-
-    override func mouseDown(with event: NSEvent) {
-        if let label = self.label {
-            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
+    override func keyDown(with event: NSEvent) {
+        switch event.keyCode {
+        case 123: // Left arrow key
+            player.position.x -= 20
+        case 124: // Right arrow key
+            player.position.x += 20
+        case 125: // Down arrow key
+            player.position.y -= 20
+        case 126: // Up arrow key
+            player.position.y += 20
+        default:
+            break
         }
-        self.makeSpinny(at: event.location(in: self), color: SKColor.green)
-    }
-    
-    override func mouseDragged(with event: NSEvent) {
-        self.makeSpinny(at: event.location(in: self), color: SKColor.blue)
-    }
-    
-    override func mouseUp(with event: NSEvent) {
-        self.makeSpinny(at: event.location(in: self), color: SKColor.red)
     }
 
+    override func keyUp(with event: NSEvent) {
+        // Handle key release if needed, such as stopping movement
+    }
+    
+    override func mouseDown(with event: NSEvent) {
+        let location = event.location(in: self)
+        player.position = location
+    }
+    
+    override func mouseMoved(with event: NSEvent) {
+        let location = event.location(in: self)
+        player.position = location
+    }
 }
 #endif
 

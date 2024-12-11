@@ -13,17 +13,23 @@ class GameViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let scene = GameScene.newGameScene()
-        
-        // Present the scene
-        let skView = self.view as! SKView
-        skView.presentScene(scene)
-        
-        skView.ignoresSiblingOrder = true
-        
-        skView.showsFPS = true
-        skView.showsNodeCount = true
+
+        // Cast the view to SKView
+        if let skView = self.view as? SKView {
+            // Load the GameScene
+            let scene = GameScene(size: CGSize(width: 800, height: 600))
+            
+            // Configure the scene
+            scene.scaleMode = .resizeFill
+            
+            // Present the scene in the SKView
+            skView.presentScene(scene)
+            
+            // Optional: Debugging options
+            skView.ignoresSiblingOrder = true
+            skView.showsFPS = true
+            skView.showsNodeCount = true
+        }
     }
 
 }
