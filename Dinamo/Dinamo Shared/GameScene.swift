@@ -14,20 +14,12 @@ class GameScene: SKScene {
     var score = 0
 
     override func didMove(to view: SKView) {
-       backgroundColor = .blue
 
        // Add player
-       player = SKSpriteNode(color: .red, size: CGSize(width: 50, height: 50))
-       player.position = CGPoint(x: size.width / 2, y: 100)
-       addChild(player)
+       player = childNode(withName: "Player") as? SKSpriteNode
 
        // Add score label
-       scoreLabel = SKLabelNode(fontNamed: "Chalkduster")
-       scoreLabel.text = "Score: 0"
-       scoreLabel.fontSize = 24
-       scoreLabel.fontColor = .white
-       scoreLabel.position = CGPoint(x: size.width / 2, y: size.height - 50)
-       addChild(scoreLabel)
+       scoreLabel = childNode(withName: "Score") as? SKLabelNode
 
        // Start spawning obstacles
        run(SKAction.repeatForever(SKAction.sequence([
@@ -37,11 +29,14 @@ class GameScene: SKScene {
     }
 
     func spawnObstacle() {
-       let obstacle = SKSpriteNode(color: .black, size: CGSize(width: 30, height: 30))
-       obstacle.position = CGPoint(x: CGFloat.random(in: 0...size.width), y: size.height)
+//        print(CGFloat.random(in: 0...size.width))
+       let obstacle = SKSpriteNode(color: .white, size: CGSize(width: 32, height: 32))
+       obstacle.position = CGPoint(x: CGFloat.random(in: -size.width/2...size.width/2), y: size.height)
+//        obstacle.position = CGPoint(x: 400, y: 600)
+
        addChild(obstacle)
 
-       let moveDown = SKAction.moveBy(x: 0, y: -size.height, duration: 5.0)
+        let moveDown = SKAction.moveBy(x: 0, y: -size.height*2, duration: 5.0)
        let remove = SKAction.removeFromParent()
        obstacle.run(SKAction.sequence([moveDown, remove]))
     }
