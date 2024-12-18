@@ -15,9 +15,10 @@ class GameViewController: UIViewController {
         super.viewDidLoad()
 
         if let skView = self.view as? SKView {
-            let scene = GameScene(size: CGSize(width: 1920, height: 1080))
-            scene.scaleMode = .aspectFill
-            skView.presentScene(scene)
+            if let scene = SKScene(fileNamed: "GameScene") {
+                scene.scaleMode = .aspectFill
+                skView.presentScene(scene)
+            }
         }
 
         // Add swipe gesture recognizers
