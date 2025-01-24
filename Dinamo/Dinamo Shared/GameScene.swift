@@ -14,42 +14,69 @@ class GameScene: SKScene {
     var score = 0
 
     override func didMove(to view: SKView) {
+        setupGame()
+    }
+    
+    func setupGame() {
+        // Remove all existing children to ensure a clean restart
+        removeAllChildren()
+        
+        score = 0
+        
+        // Add player
+        player = SKSpriteNode(color: .red, size: CGSize(width: 32, height: 32))
+        player.name = "Player"
+        player.position = CGPoint(x: 0, y: -size.height / 4)
+        addChild(player)
 
-       // Add player
-       player = childNode(withName: "Player") as? SKSpriteNode
+        // Add score label
+        scoreLabel = SKLabelNode(text: "Score: \(score)")
+        scoreLabel.name = "Score"
+        scoreLabel.position = CGPoint(x: 0, y: size.height / 2 - 50)
+        addChild(scoreLabel)
 
-       // Add score label
-       scoreLabel = childNode(withName: "Score") as? SKLabelNode
-
-       // Start spawning obstacles
-       run(SKAction.repeatForever(SKAction.sequence([
-           SKAction.run(spawnObstacle),
-           SKAction.wait(forDuration: 1.0)
-       ])))
+        // Start spawning obstacles
+        run(SKAction.repeatForever(SKAction.sequence([
+            SKAction.run(spawnObstacle),
+            SKAction.wait(forDuration: 1.0)
+        ])), withKey: "spawnObstacles")
+        
+        // Resume game
+        isPaused = false
     }
 
     func spawnObstacle() {
-       let obstacle = SKSpriteNode(color: .white, size: CGSize(width: 32, height: 32))
-       obstacle.position = CGPoint(x: CGFloat.random(in: -size.width/2...size.width/2), y: size.height)
+        let obstacle = SKSpriteNode(color: .white, size: CGSize(width: 32, height: 32))
+        obstacle.position = CGPoint(x: CGFloat.random(in: -size.width/2...size.width/2), y: size.height)
 
-       addChild(obstacle)
+        addChild(obstacle)
 
         let moveDown = SKAction.moveBy(x: 0, y: -size.height*2, duration: 5.0)
-       let remove = SKAction.removeFromParent()
-       obstacle.run(SKAction.sequence([moveDown, remove]))
+        let remove = SKAction.removeFromParent()
+        obstacle.run(SKAction.sequence([moveDown, remove]))
     }
 
     override func update(_ currentTime: TimeInterval) {
-       for node in children {
-           if node != player && node != scoreLabel && player.frame.intersects(node.frame) {
-               gameOver()
-           }
-       }
+        for node in children {
+            if node != player && node != scoreLabel && player.frame.intersects(node.frame) {
+                gameOver()
+            }
+        }
     }
 
     func gameOver() {
-       isPaused = true
-       scoreLabel.text = "Game Over! Score: \(score)"
+        // Stop spawning obstacles and pause the game
+        isPaused = true
+        removeAction(forKey: "spawnObstacles")
+        
+        // Update score label to show "Game Over" message
+        scoreLabel.text = "Game Over! Score: \(score)"
+        
+        // Allow user to restart the game with a tap
+        let restartLabel = SKLabelNode(text: "Tap anywhere to restart")
+        restartLabel.position = CGPoint(x: 0, y: -50)
+        restartLabel.name = "RestartLabel"
+        addChild(restartLabel)
     }
 }
 
@@ -68,6 +95,13 @@ extension GameScene {
             player.position.x = location.x
         }
     }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if isPaused {
+            // Restart the game on touch if the game is paused
+            setupGame()
+        }
+    }
 
     func handleSwipe(direction: SwipeDirection) {
         switch direction {
@@ -84,18 +118,23 @@ extension GameScene {
 // Mouse-based event handling
 extension GameScene {
     override func keyDown(with event: NSEvent) {
-        switch event.keyCode {
-        case 123: // Left arrow key
-            player.position.x -= 20
-        case 124: // Right arrow key
-            player.position.x += 20
-        case 125: // Down arrow key
-            player.position.y -= 20
-        case 126: // Up arrow key
-            player.position.y += 20
-        default:
-            break
+        if isPaused {
+            setupGame()
+        } else {
+            switch event.keyCode {
+            case 123: // Left arrow key
+                player.position.x -= 20
+            case 124: // Right arrow key
+                player.position.x += 20
+            case 125: // Down arrow key
+                player.position.y -= 20
+            case 126: // Up arrow key
+                player.position.y += 20
+            default:
+                break
+            }
         }
+        
     }
 
     override func keyUp(with event: NSEvent) {
@@ -103,8 +142,13 @@ extension GameScene {
     }
     
     override func mouseDown(with event: NSEvent) {
-        let location = event.location(in: self)
-        player.position = location
+        if isPaused {
+            setupGame()
+        } else {
+            let location = event.location(in: self)
+            player.position = location
+        }
+        
     }
     
     override func mouseMoved(with event: NSEvent) {
