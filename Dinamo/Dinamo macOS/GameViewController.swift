@@ -17,7 +17,6 @@ class GameViewController: NSViewController {
         // Cast the view to SKView
         if let skView = self.view as? SKView {
             // Load the GameScene
-//            let scene = GameScene(size: CGSize(width: 800, height: 600))
             if let scene = SKScene(fileNamed: "GameScene") {
                 // Configure the scene
                 scene.scaleMode = .resizeFill

@@ -29,10 +29,8 @@ class GameScene: SKScene {
     }
 
     func spawnObstacle() {
-//        print(CGFloat.random(in: 0...size.width))
        let obstacle = SKSpriteNode(color: .white, size: CGSize(width: 32, height: 32))
        obstacle.position = CGPoint(x: CGFloat.random(in: -size.width/2...size.width/2), y: size.height)
-//        obstacle.position = CGPoint(x: 400, y: 600)
 
        addChild(obstacle)
 
