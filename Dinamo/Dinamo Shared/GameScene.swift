@@ -1080,6 +1080,33 @@ class GameScene: SKScene {
         isGameOverState = true
         messageLabel.text = "GAME OVER\n\nSCORE: \(score)\n\nPRESS FIRE / TAP"
         messageLabel.isHidden = false
+
+        if score > 0 {
+            submitScoreToLeaderboard()
+        }
+    }
+
+    private func submitScoreToLeaderboard() {
+        guard let url = URL(string: "http://localhost:8000/api/leaderboard") else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let payload: [String: Any] = [
+            "player": "APL",
+            "score": score,
+            "stage": stage,
+            "platform": "apple"
+        ]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: payload)
+        URLSession.shared.dataTask(with: request) { [weak self] data, _, _ in
+            guard let data = data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let rank = json["rank"] as? Int,
+                  let self = self else { return }
+            DispatchQueue.main.async {
+                self.messageLabel.text = "GAME OVER\n\nSCORE: \(self.score)\nGLOBAL RANK: #\(rank)\n\nPRESS FIRE / TAP"
+            }
+        }.resume()
     }
 
     // MARK: - Controller Support
