@@ -2,7 +2,7 @@
 //  GameScene.swift
 //  Dinamo Shared
 //
-//  Galaga 1981 Retro Arcade Engine for Apple Platforms (iOS, macOS, tvOS)
+//  Galaga 1981 & Game Boy Retro Shooter Engine for Apple Platforms (iOS, macOS, tvOS)
 //
 
 import SpriteKit
@@ -13,6 +13,13 @@ import GameController
 #endif
 
 // MARK: - Enums & Data Structures
+
+enum GameTheme: String, CaseIterable {
+    case dmg = "DMG"
+    case pocket = "Pocket"
+    case gbc = "GBC"
+    case arcade = "Arcade"
+}
 
 enum EnemyType {
     case bee
@@ -31,6 +38,8 @@ enum EnemyState {
 enum SwipeDirection {
     case left
     case right
+    case up
+    case down
 }
 #endif
 
@@ -44,12 +53,12 @@ class EnemyNode: SKSpriteNode {
     var diveTargetX: CGFloat = 0
 }
 
-// MARK: - Procedural Retro Sound Engine
+// MARK: - Procedural Retro & Chiptune Sound Engine
 class SoundEngine {
     static let shared = SoundEngine()
     var isMuted = false
+    var isGBMode = true
     private var audioEngine = AVAudioEngine()
-    private var isEngineRunning = false
 
     init() {
         setupAudio()
@@ -67,7 +76,7 @@ class SoundEngine {
     }
 
     // Generate short sound waveform in memory and play via AVAudioPlayer
-    func playTone(freqStart: Double, freqEnd: Double, duration: Double, isNoise: Bool = false) {
+    func playTone(freqStart: Double, freqEnd: Double, duration: Double, isNoise: Bool = false, dutyCycle: Double = 0.5) {
         guard !isMuted else { return }
 
         DispatchQueue.global(qos: .userInteractive).async {
@@ -76,56 +85,63 @@ class SoundEngine {
             var samples = [Float](repeating: 0, count: numSamples)
 
             if isNoise {
-                // White noise burst with decay
+                // Game Boy Channel 4 7-bit LFSR pseudo-random noise simulation
+                var lfsr: UInt16 = 0x7fff
                 for i in 0..<numSamples {
                     let progress = Double(i) / Double(numSamples)
-                    let decay = Float(exp(-progress * 6.0))
-                    let raw = Float.random(in: -1.0...1.0)
-                    samples[i] = raw * decay * 0.4
+                    let envelope = Float(max(0.0, 1.0 - progress))
+                    let bit = (lfsr & 1) ^ ((lfsr >> 1) & 1)
+                    lfsr = (lfsr >> 1) | (bit << 14)
+                    // 7-bit metallic crunch
+                    lfsr = (lfsr & ~0x40) | (bit << 6)
+                    let val = (lfsr & 1) != 0 ? Float(0.8) : Float(-0.8)
+                    samples[i] = val * envelope * 0.45
                 }
             } else {
-                // Pitch slide (chirp / laser / swoop)
-                var phase = 0.0
+                // Pulse square wave (Channel 1 & 2)
+                var phase: Double = 0.0
                 for i in 0..<numSamples {
                     let progress = Double(i) / Double(numSamples)
                     let currentFreq = freqStart + (freqEnd - freqStart) * progress
-                    let decay = Float(exp(-progress * 4.0))
-                    phase += 2.0 * Double.pi * currentFreq / sampleRate
-                    let wave = Float(sin(phase) > 0 ? 0.3 : -0.3) // Square wave for 8-bit sound
-                    samples[i] = wave * decay
+                    let phaseInc = (2.0 * Double.pi * currentFreq) / sampleRate
+                    phase += phaseInc
+                    if phase > 2.0 * Double.pi { phase -= 2.0 * Double.pi }
+
+                    let wave = sin(phase) > (2.0 * (dutyCycle - 0.5)) ? Float(0.7) : Float(-0.7)
+                    let envelope = Float(max(0.0, 1.0 - progress * 1.1))
+                    samples[i] = wave * envelope * 0.35
                 }
             }
 
-            // Create WAV format data
             guard let wavData = self.createWavData(samples: samples, sampleRate: Int(sampleRate)) else { return }
 
             DispatchQueue.main.async {
                 do {
                     let player = try AVAudioPlayer(data: wavData)
+                    player.volume = 0.8
                     player.play()
-                    // Retain player until completion
-                    objc_setAssociatedObject(self, "audio_\(arc4random())", player, .OBJC_ASSOCIATION_RETAIN)
+                    objc_setAssociatedObject(self, "sound_\(Date().timeIntervalSince1970)", player, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
                 } catch {
-                    // Fallback silently if audio player fails
+                    // Audio fallback
                 }
             }
         }
     }
 
     func playLaser() {
-        playTone(freqStart: 900, freqEnd: 150, duration: 0.12)
+        playTone(freqStart: 880, freqEnd: 220, duration: 0.11, isNoise: false)
     }
 
     func playExplosion() {
-        playTone(freqStart: 0, freqEnd: 0, duration: 0.28, isNoise: true)
+        playTone(freqStart: 0, freqEnd: 0, duration: 0.22, isNoise: true)
     }
 
     func playDive() {
-        playTone(freqStart: 580, freqEnd: 280, duration: 0.35)
+        playTone(freqStart: 520, freqEnd: 260, duration: 0.35, isNoise: false)
     }
 
     func playPlayerDeath() {
-        playTone(freqStart: 0, freqEnd: 0, duration: 0.55, isNoise: true)
+        playTone(freqStart: 0, freqEnd: 0, duration: 0.48, isNoise: true)
     }
 
     private func createWavData(samples: [Float], sampleRate: Int) -> Data? {
@@ -165,9 +181,11 @@ class SoundEngine {
     }
 }
 
-// MARK: - Procedural Texture Generator
+// MARK: - Procedural Texture Generator with Authentic Palettes
 class RetroTextures {
     static let shared = RetroTextures()
+
+    var currentTheme: GameTheme = .dmg
 
     var player: SKTexture!
     var playerMini: SKTexture!
@@ -187,7 +205,12 @@ class RetroTextures {
         generateAll()
     }
 
-    private func createTexture(width: Int, height: Int, pixels: [String], colors: [Character: (CGFloat, CGFloat, CGFloat)], scale: Int = 2) -> SKTexture {
+    func setTheme(_ theme: GameTheme) {
+        self.currentTheme = theme
+        generateAll()
+    }
+
+    private func createTexture(width: Int, height: Int, pixels: [String], colors: [Character: (CGFloat, CGFloat, CGFloat)], scale: Int = 1) -> SKTexture {
         let outW = width * scale
         let outH = height * scale
         let colorSpace = CGColorSpaceCreateDeviceRGB()
@@ -221,16 +244,64 @@ class RetroTextures {
         return tex
     }
 
-    private func generateAll() {
-        let colors: [Character: (CGFloat, CGFloat, CGFloat)] = [
-            "W": (1.0, 1.0, 1.0),
-            "R": (1.0, 0.15, 0.15),
-            "B": (0.15, 0.5, 1.0),
-            "Y": (1.0, 0.88, 0.0),
-            "G": (0.0, 0.88, 0.25),
-            "C": (0.15, 1.0, 1.0),
-            "O": (1.0, 0.55, 0.0),
-        ]
+    func generateAll() {
+        let colors: [Character: (CGFloat, CGFloat, CGFloat)]
+
+        switch currentTheme {
+        case .dmg:
+            // Authentic Game Boy DMG (1989) pea-green monochrome
+            let lightest: (CGFloat, CGFloat, CGFloat) = (224.0/255.0, 248.0/255.0, 208.0/255.0) // #e0f8d0
+            let light: (CGFloat, CGFloat, CGFloat)    = (136.0/255.0, 192.0/255.0, 112.0/255.0) // #88c070
+            let dark: (CGFloat, CGFloat, CGFloat)     = (52.0/255.0, 104.0/255.0, 86.0/255.0)   // #346856
+            let darkest: (CGFloat, CGFloat, CGFloat)  = (8.0/255.0, 24.0/255.0, 32.0/255.0)     // #081820
+            colors = [
+                "W": lightest, "C": lightest,
+                "B": light, "Y": light, "G": light,
+                "R": dark, "O": dark, "P": dark,
+                "D": darkest
+            ]
+
+        case .pocket:
+            // Authentic Game Boy Pocket (1996) true monochrome FSTN
+            let lightest: (CGFloat, CGFloat, CGFloat) = (1.0, 1.0, 1.0)
+            let light: (CGFloat, CGFloat, CGFloat)    = (170.0/255.0, 170.0/255.0, 170.0/255.0)
+            let dark: (CGFloat, CGFloat, CGFloat)     = (85.0/255.0, 85.0/255.0, 85.0/255.0)
+            let darkest: (CGFloat, CGFloat, CGFloat)  = (0.0, 0.0, 0.0)
+            colors = [
+                "W": lightest, "C": lightest,
+                "B": light, "Y": light, "G": light,
+                "R": dark, "O": dark, "P": dark,
+                "D": darkest
+            ]
+
+        case .gbc:
+            // Game Boy Color (1998) 4-color sprite banks
+            colors = [
+                "W": (1.0, 1.0, 1.0),
+                "R": (216.0/255.0, 40.0/255.0, 0.0),
+                "B": (0.0, 104.0/255.0, 248.0/255.0),
+                "Y": (248.0/255.0, 216.0/255.0, 0.0),
+                "G": (0.0, 232.0/255.0, 72.0/255.0),
+                "C": (0.0, 232.0/255.0, 216.0/255.0),
+                "O": (248.0/255.0, 136.0/255.0, 0.0),
+                "P": (184.0/255.0, 0.0, 64.0/255.0),
+                "D": (24.0/255.0, 24.0/255.0, 40.0/255.0),
+            ]
+
+        case .arcade:
+            // Original Galaga 1981 Arcade Colors
+            colors = [
+                "W": (1.0, 1.0, 1.0),
+                "R": (1.0, 0.15, 0.15),
+                "B": (0.15, 0.5, 1.0),
+                "Y": (1.0, 0.88, 0.0),
+                "G": (0.0, 0.88, 0.25),
+                "C": (0.15, 1.0, 1.0),
+                "O": (1.0, 0.55, 0.0),
+                "P": (0.65, 0.25, 1.0),
+                "D": (0.25, 0.25, 0.25),
+            ]
+        }
 
         let playerPixels = [
             "       W       ",
@@ -250,7 +321,7 @@ class RetroTextures {
             "               ",
             "               ",
         ]
-        player = createTexture(width: 15, height: 16, pixels: playerPixels, colors: colors, scale: 2)
+        player = createTexture(width: 15, height: 16, pixels: playerPixels, colors: colors, scale: 1)
         playerMini = createTexture(width: 15, height: 16, pixels: playerPixels, colors: colors, scale: 1)
 
         let bee1Pixels = [
@@ -289,8 +360,8 @@ class RetroTextures {
             "      YY        ",
             "                ",
         ]
-        bee1 = createTexture(width: 16, height: 16, pixels: bee1Pixels, colors: colors, scale: 2)
-        bee2 = createTexture(width: 16, height: 16, pixels: bee2Pixels, colors: colors, scale: 2)
+        bee1 = createTexture(width: 16, height: 16, pixels: bee1Pixels, colors: colors, scale: 1)
+        bee2 = createTexture(width: 16, height: 16, pixels: bee2Pixels, colors: colors, scale: 1)
 
         let bfly1Pixels = [
             "      CCCC      ",
@@ -328,8 +399,8 @@ class RetroTextures {
             "                ",
             "                ",
         ]
-        butterfly1 = createTexture(width: 16, height: 16, pixels: bfly1Pixels, colors: colors, scale: 2)
-        butterfly2 = createTexture(width: 16, height: 16, pixels: bfly2Pixels, colors: colors, scale: 2)
+        butterfly1 = createTexture(width: 16, height: 16, pixels: bfly1Pixels, colors: colors, scale: 1)
+        butterfly2 = createTexture(width: 16, height: 16, pixels: bfly2Pixels, colors: colors, scale: 1)
 
         let bossG1Pixels = [
             "      GGGG      ",
@@ -367,36 +438,57 @@ class RetroTextures {
             "                ",
             "                ",
         ]
-        bossGreen1 = createTexture(width: 16, height: 16, pixels: bossG1Pixels, colors: colors, scale: 2)
-        bossGreen2 = createTexture(width: 16, height: 16, pixels: bossG2Pixels, colors: colors, scale: 2)
+        bossGreen1 = createTexture(width: 16, height: 16, pixels: bossG1Pixels, colors: colors, scale: 1)
+        bossGreen2 = createTexture(width: 16, height: 16, pixels: bossG2Pixels, colors: colors, scale: 1)
 
         let bossB1Pixels = bossG1Pixels.map { $0.replacingOccurrences(of: "G", with: "B") }
         let bossB2Pixels = bossG2Pixels.map { $0.replacingOccurrences(of: "G", with: "B") }
-        bossBlue1 = createTexture(width: 16, height: 16, pixels: bossB1Pixels, colors: colors, scale: 2)
-        bossBlue2 = createTexture(width: 16, height: 16, pixels: bossB2Pixels, colors: colors, scale: 2)
+        bossBlue1 = createTexture(width: 16, height: 16, pixels: bossB1Pixels, colors: colors, scale: 1)
+        bossBlue2 = createTexture(width: 16, height: 16, pixels: bossB2Pixels, colors: colors, scale: 1)
 
-        let laserPixels = ["R R", "Y Y", "Y Y", "W W", "W W", "Y Y", "Y Y", "R R"]
-        playerLaser = createTexture(width: 3, height: 8, pixels: laserPixels, colors: colors, scale: 2)
+        let laserPixels = [
+            "R R",
+            "Y Y",
+            "Y Y",
+            "W W",
+            "W W",
+            "Y Y",
+            "Y Y",
+            "R R",
+        ]
+        playerLaser = createTexture(width: 3, height: 8, pixels: laserPixels, colors: colors, scale: 1)
 
-        let bulletPixels = [" O ", "OOO", "OWO", "OOO", " O "]
-        alienBullet = createTexture(width: 3, height: 5, pixels: bulletPixels, colors: colors, scale: 2)
+        let bulletPixels = [
+            " O ",
+            "OOO",
+            "OWO",
+            "OOO",
+            " O ",
+        ]
+        alienBullet = createTexture(width: 3, height: 5, pixels: bulletPixels, colors: colors, scale: 1)
 
         let exp1 = ["  W  "]
         let exp2 = ["  Y  ", " YWY ", "  Y  "]
         let exp3 = [" R O R ", "  YWY  ", "OW W WO", "  YWY  ", " R O R "]
         let exp4 = ["R  O  R", " Y   Y ", "O  W  O", " Y   Y ", "R  O  R"]
         explosions = [
-            createTexture(width: 5, height: 1, pixels: exp1, colors: colors, scale: 3),
-            createTexture(width: 5, height: 3, pixels: exp2, colors: colors, scale: 3),
-            createTexture(width: 7, height: 5, pixels: exp3, colors: colors, scale: 3),
-            createTexture(width: 7, height: 5, pixels: exp4, colors: colors, scale: 3),
+            createTexture(width: 5, height: 1, pixels: exp1, colors: colors, scale: 1),
+            createTexture(width: 5, height: 3, pixels: exp2, colors: colors, scale: 1),
+            createTexture(width: 7, height: 5, pixels: exp3, colors: colors, scale: 1),
+            createTexture(width: 7, height: 5, pixels: exp4, colors: colors, scale: 1),
         ]
     }
 }
 
-// MARK: - GameScene Main Class
-
+// MARK: - GameScene Main Implementation
 class GameScene: SKScene {
+
+    // Native 160x144 Game Boy Resolution
+    let nativeWidth: CGFloat = 160.0
+    let nativeHeight: CGFloat = 144.0
+
+    // Theme state
+    var currentTheme: GameTheme = .dmg
 
     // Scene & Display Layers
     private var starLayer = SKNode()
@@ -415,6 +507,7 @@ class GameScene: SKScene {
     private var highScoreLabel: SKLabelNode!
     private var stageLabel: SKLabelNode!
     private var messageLabel: SKLabelNode!
+    private var themeLabel: SKLabelNode!
 
     // State Variables
     private var score = 0
@@ -451,14 +544,17 @@ class GameScene: SKScene {
     private var stars: [(node: SKShapeNode, speed: CGFloat)] = []
 
     override func didMove(to view: SKView) {
+        // Enforce authentic 160x144 Game Boy viewport with aspect-fit scaling
+        self.size = CGSize(width: nativeWidth, height: nativeHeight)
+        self.scaleMode = .aspectFit
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        backgroundColor = SKColor(red: 0.02, green: 0.02, blue: 0.05, alpha: 1.0)
 
         // Setup Scene Layers
         addChild(starLayer)
         addChild(gameLayer)
         addChild(hudLayer)
 
+        setupThemeColors()
         setupStarfield()
         setupHUD()
         setupPlayer()
@@ -467,31 +563,73 @@ class GameScene: SKScene {
         startNewGame()
     }
 
+    func setTheme(_ theme: GameTheme) {
+        currentTheme = theme
+        RetroTextures.shared.setTheme(theme)
+        setupThemeColors()
+        setupStarfield()
+        updateHUDTheme()
+
+        if player != nil {
+            player.texture = RetroTextures.shared.player
+        }
+        for enemy in enemies {
+            updateEnemyTexture(enemy: enemy)
+        }
+        updateLifeIcons()
+    }
+
+    func cycleTheme() {
+        let all = GameTheme.allCases
+        if let idx = all.firstIndex(of: currentTheme) {
+            let nextTheme = all[(idx + 1) % all.count]
+            setTheme(nextTheme)
+        }
+    }
+
+    private func setupThemeColors() {
+        switch currentTheme {
+        case .dmg:
+            backgroundColor = SKColor(red: 8/255, green: 24/255, blue: 32/255, alpha: 1.0)
+        case .pocket:
+            backgroundColor = .black
+        case .gbc:
+            backgroundColor = SKColor(red: 8/255, green: 16/255, blue: 32/255, alpha: 1.0)
+        case .arcade:
+            backgroundColor = SKColor(red: 5/255, green: 5/255, blue: 13/255, alpha: 1.0)
+        }
+    }
+
     private func setupStarfield() {
         starLayer.removeAllChildren()
         stars.removeAll()
 
-        let colors: [SKColor] = [.white, .cyan, .yellow, .red]
-        for _ in 0..<80 {
-            let size: CGFloat = CGFloat.random(in: 1.0...2.5)
-            let star = SKShapeNode(rectOf: CGSize(width: size, height: size))
-            star.fillColor = colors.randomElement() ?? .white
+        let starColors: [SKColor]
+        switch currentTheme {
+        case .dmg:
+            starColors = [
+                SKColor(red: 136/255, green: 192/255, blue: 112/255, alpha: 1.0),
+                SKColor(red: 224/255, green: 248/255, blue: 208/255, alpha: 1.0)
+            ]
+        case .pocket:
+            starColors = [.white, SKColor(white: 0.65, alpha: 1.0)]
+        case .gbc:
+            starColors = [.yellow, .cyan, .white]
+        case .arcade:
+            starColors = [.white, .cyan, .yellow, .red]
+        }
+
+        for _ in 0..<28 {
+            let star = SKShapeNode(rectOf: CGSize(width: 1, height: 1))
+            star.fillColor = starColors.randomElement() ?? .white
             star.strokeColor = .clear
             star.position = CGPoint(
-                x: CGFloat.random(in: -sizeWidth / 2...sizeWidth / 2),
-                y: CGFloat.random(in: -sizeHeight / 2...sizeHeight / 2)
+                x: CGFloat.random(in: -nativeWidth / 2...nativeWidth / 2),
+                y: CGFloat.random(in: -nativeHeight / 2...nativeHeight / 2)
             )
             starLayer.addChild(star)
-            stars.append((node: star, speed: CGFloat.random(in: 40...160)))
+            stars.append((node: star, speed: CGFloat.random(in: 12...35)))
         }
-    }
-
-    private var sizeWidth: CGFloat {
-        return size.width > 0 ? size.width : 448
-    }
-
-    private var sizeHeight: CGFloat {
-        return size.height > 0 ? size.height : 640
     }
 
     private func setupHUD() {
@@ -501,48 +639,64 @@ class GameScene: SKScene {
 
         let oneUpTitle = SKLabelNode(fontNamed: font)
         oneUpTitle.text = "1UP"
-        oneUpTitle.fontSize = 14
-        oneUpTitle.fontColor = .red
-        oneUpTitle.position = CGPoint(x: -sizeWidth / 2 + 50, y: sizeHeight / 2 - 35)
+        oneUpTitle.fontSize = 6
+        oneUpTitle.fontColor = currentTheme == .dmg ? SKColor(red: 224/255, green: 248/255, blue: 208/255, alpha: 1.0) : .red
+        oneUpTitle.position = CGPoint(x: -nativeWidth / 2 + 18, y: nativeHeight / 2 - 8)
         hudLayer.addChild(oneUpTitle)
 
         scoreLabel = SKLabelNode(fontNamed: font)
         scoreLabel.text = "00"
-        scoreLabel.fontSize = 14
-        scoreLabel.fontColor = .white
-        scoreLabel.position = CGPoint(x: -sizeWidth / 2 + 50, y: sizeHeight / 2 - 55)
+        scoreLabel.fontSize = 6
+        scoreLabel.fontColor = currentTheme == .dmg ? SKColor(red: 224/255, green: 248/255, blue: 208/255, alpha: 1.0) : .white
+        scoreLabel.position = CGPoint(x: -nativeWidth / 2 + 18, y: nativeHeight / 2 - 16)
         hudLayer.addChild(scoreLabel)
 
         let highTitle = SKLabelNode(fontNamed: font)
-        highTitle.text = "HIGH SCORE"
-        highTitle.fontSize = 14
-        highTitle.fontColor = .red
-        highTitle.position = CGPoint(x: 0, y: sizeHeight / 2 - 35)
+        highTitle.text = "HIGH"
+        highTitle.fontSize = 6
+        highTitle.fontColor = currentTheme == .dmg ? SKColor(red: 224/255, green: 248/255, blue: 208/255, alpha: 1.0) : .red
+        highTitle.position = CGPoint(x: 0, y: nativeHeight / 2 - 8)
         hudLayer.addChild(highTitle)
 
         highScoreLabel = SKLabelNode(fontNamed: font)
         highScoreLabel.text = "\(highScore)"
-        highScoreLabel.fontSize = 14
-        highScoreLabel.fontColor = .white
-        highScoreLabel.position = CGPoint(x: 0, y: sizeHeight / 2 - 55)
+        highScoreLabel.fontSize = 6
+        highScoreLabel.fontColor = currentTheme == .dmg ? SKColor(red: 224/255, green: 248/255, blue: 208/255, alpha: 1.0) : .white
+        highScoreLabel.position = CGPoint(x: 0, y: nativeHeight / 2 - 16)
         hudLayer.addChild(highScoreLabel)
 
         stageLabel = SKLabelNode(fontNamed: font)
-        stageLabel.text = "STAGE 1"
-        stageLabel.fontSize = 14
-        stageLabel.fontColor = .red
-        stageLabel.position = CGPoint(x: sizeWidth / 2 - 60, y: sizeHeight / 2 - 55)
+        stageLabel.text = "ST 1"
+        stageLabel.fontSize = 6
+        stageLabel.fontColor = currentTheme == .dmg ? SKColor(red: 136/255, green: 192/255, blue: 112/255, alpha: 1.0) : .cyan
+        stageLabel.position = CGPoint(x: nativeWidth / 2 - 18, y: nativeHeight / 2 - 16)
         hudLayer.addChild(stageLabel)
+
+        themeLabel = SKLabelNode(fontNamed: font)
+        themeLabel.text = "[\(currentTheme.rawValue)]"
+        themeLabel.fontSize = 5
+        themeLabel.fontColor = currentTheme == .dmg ? SKColor(red: 136/255, green: 192/255, blue: 112/255, alpha: 1.0) : .gray
+        themeLabel.position = CGPoint(x: nativeWidth / 2 - 18, y: -nativeHeight / 2 + 8)
+        hudLayer.addChild(themeLabel)
 
         messageLabel = SKLabelNode(fontNamed: font)
         messageLabel.text = ""
-        messageLabel.fontSize = 22
-        messageLabel.fontColor = .yellow
+        messageLabel.fontSize = 9
+        messageLabel.fontColor = currentTheme == .dmg ? SKColor(red: 224/255, green: 248/255, blue: 208/255, alpha: 1.0) : .yellow
         messageLabel.position = .zero
         messageLabel.numberOfLines = 3
         hudLayer.addChild(messageLabel)
 
         updateLifeIcons()
+    }
+
+    private func updateHUDTheme() {
+        let fontColor = currentTheme == .dmg ? SKColor(red: 224/255, green: 248/255, blue: 208/255, alpha: 1.0) : .white
+        scoreLabel?.fontColor = fontColor
+        highScoreLabel?.fontColor = fontColor
+        messageLabel?.fontColor = currentTheme == .dmg ? fontColor : .yellow
+        themeLabel?.text = "[\(currentTheme.rawValue)]"
+        themeLabel?.fontColor = currentTheme == .dmg ? SKColor(red: 136/255, green: 192/255, blue: 112/255, alpha: 1.0) : .gray
     }
 
     private func updateLifeIcons() {
@@ -551,7 +705,7 @@ class GameScene: SKScene {
 
         for i in 0..<max(0, lives - 1) {
             let icon = SKSpriteNode(texture: RetroTextures.shared.playerMini)
-            icon.position = CGPoint(x: -sizeWidth / 2 + 30 + CGFloat(i * 22), y: -sizeHeight / 2 + 25)
+            icon.position = CGPoint(x: -nativeWidth / 2 + 12 + CGFloat(i * 10), y: -nativeHeight / 2 + 8)
             hudLayer.addChild(icon)
             lifeIcons.append(icon)
         }
@@ -559,7 +713,7 @@ class GameScene: SKScene {
 
     private func setupPlayer() {
         player = SKSpriteNode(texture: RetroTextures.shared.player)
-        player.position = CGPoint(x: 0, y: -sizeHeight / 2 + 65)
+        player.position = CGPoint(x: 0, y: -nativeHeight / 2 + 16)
         player.name = "Player"
         gameLayer.addChild(player)
     }
@@ -582,23 +736,23 @@ class GameScene: SKScene {
         updateLifeIcons()
         scoreLabel.text = "00"
         player.isHidden = false
-        player.position = CGPoint(x: 0, y: -sizeHeight / 2 + 65)
+        player.position = CGPoint(x: 0, y: -nativeHeight / 2 + 16)
 
         startStage(stageNumber: stage)
     }
 
     private func startStage(stageNumber: Int) {
         stage = stageNumber
-        stageLabel.text = "STAGE \(stage)"
+        stageLabel.text = "ST \(stage)"
         isStageIntro = true
         messageLabel.text = "STAGE \(stage)\n\nREADY"
         messageLabel.isHidden = false
 
-        SoundEngine.shared.playTone(freqStart: 260, freqEnd: 520, duration: 0.4)
+        SoundEngine.shared.playTone(freqStart: 260, freqEnd: 520, duration: 0.35)
 
         buildWaveQueue()
 
-        let waitAction = SKAction.wait(forDuration: 2.2)
+        let waitAction = SKAction.wait(forDuration: 2.0)
         let finishIntro = SKAction.run { [weak self] in
             self?.isStageIntro = false
             self?.messageLabel.isHidden = true
@@ -606,11 +760,12 @@ class GameScene: SKScene {
         run(SKAction.sequence([waitAction, finishIntro]))
     }
 
+    // 10-ship armada formation matching GBGame
     private func getFormationSlot(row: Int, col: Int) -> CGPoint {
-        let colSpacing: CGFloat = 34
-        let rowSpacing: CGFloat = 26
-        let startX: CGFloat = -CGFloat(10 - 1) * colSpacing / 2.0
-        let startY: CGFloat = sizeHeight / 2 - 120
+        let colSpacing: CGFloat = 16
+        let rowSpacing: CGFloat = 14
+        let startX: CGFloat = -CGFloat(5) * colSpacing / 2.0
+        let startY: CGFloat = nativeHeight / 2 - 28
 
         return CGPoint(
             x: startX + CGFloat(col) * colSpacing,
@@ -621,41 +776,25 @@ class GameScene: SKScene {
     private func buildWaveQueue() {
         waveQueue.removeAll()
 
-        let w1: [(EnemyType, Int, Int, String)] = [
-            (.boss, 0, 4, "topLeft"), (.boss, 0, 5, "topRight"),
-            (.boss, 0, 3, "topLeft"), (.boss, 0, 6, "topRight"),
-            (.butterfly, 1, 4, "topLeft"), (.butterfly, 1, 5, "topRight"),
-            (.butterfly, 1, 3, "topLeft"), (.butterfly, 1, 6, "topRight"),
+        // 10-ship armada layout:
+        // Row 0: 2 Bosses (cols 2, 3)
+        // Row 1: 4 Escorts (cols 1, 2, 3, 4)
+        // Row 2: 4 Bees (cols 1, 2, 3, 4)
+        let waveItems: [(EnemyType, Int, Int, String)] = [
+            (.boss, 0, 2, "topLeft"), (.boss, 0, 3, "topRight"),
+            (.butterfly, 1, 1, "leftSide"), (.butterfly, 1, 4, "rightSide"),
+            (.butterfly, 1, 2, "topLeft"), (.butterfly, 1, 3, "topRight"),
+            (.bee, 2, 1, "leftSide"), (.bee, 2, 4, "rightSide"),
+            (.bee, 2, 2, "topLeft"), (.bee, 2, 3, "topRight"),
         ]
 
-        let w2: [(EnemyType, Int, Int, String)] = [
-            (.butterfly, 1, 1, "leftSide"), (.butterfly, 1, 8, "rightSide"),
-            (.butterfly, 1, 2, "leftSide"), (.butterfly, 1, 7, "rightSide"),
-            (.bee, 2, 4, "leftSide"), (.bee, 2, 5, "rightSide"),
-            (.bee, 2, 3, "leftSide"), (.bee, 2, 6, "rightSide"),
-        ]
-
-        let w3: [(EnemyType, Int, Int, String)] = [
-            (.bee, 2, 1, "topLeft"), (.bee, 2, 8, "topRight"),
-            (.bee, 2, 2, "topLeft"), (.bee, 2, 7, "topRight"),
-            (.bee, 3, 4, "topLeft"), (.bee, 3, 5, "topRight"),
-            (.bee, 3, 3, "topLeft"), (.bee, 3, 6, "topRight"),
-        ]
-
-        let w4: [(EnemyType, Int, Int, String)] = [
-            (.bee, 3, 0, "leftSide"), (.bee, 3, 9, "rightSide"),
-            (.bee, 3, 1, "leftSide"), (.bee, 3, 8, "rightSide"),
-            (.bee, 3, 2, "leftSide"), (.bee, 3, 7, "rightSide"),
-        ]
-
-        let all = w1 + w2 + w3 + w4
-        for (idx, item) in all.enumerated() {
+        for (idx, item) in waveItems.enumerated() {
             waveQueue.append(WaveSpawn(
                 type: item.0,
                 row: item.1,
                 col: item.2,
                 pathType: item.3,
-                delay: 0.2 + Double(idx) * 0.22
+                delay: 0.15 + Double(idx) * 0.18
             ))
         }
     }
@@ -683,7 +822,7 @@ class GameScene: SKScene {
         gameLayer.addChild(enemy)
         enemies.append(enemy)
 
-        let follow = SKAction.follow(path, asOffset: false, orientToPath: true, duration: 2.8)
+        let follow = SKAction.follow(path, asOffset: false, orientToPath: true, duration: 2.2)
         let lockIn = SKAction.run { [weak enemy] in
             enemy?.state = .formation
             enemy?.zRotation = 0
@@ -696,37 +835,37 @@ class GameScene: SKScene {
 
         switch type {
         case "topLeft":
-            path.move(to: CGPoint(x: -sizeWidth / 2 - 20, y: sizeHeight / 2 - 60))
-            path.addCurve(to: CGPoint(x: 40, y: 0),
-                          control1: CGPoint(x: -40, y: sizeHeight / 4),
-                          control2: CGPoint(x: 80, y: 80))
+            path.move(to: CGPoint(x: -nativeWidth / 2 - 10, y: nativeHeight / 2 - 20))
+            path.addCurve(to: CGPoint(x: 15, y: 0),
+                          control1: CGPoint(x: -15, y: nativeHeight / 4),
+                          control2: CGPoint(x: 30, y: 25))
             path.addCurve(to: target,
-                          control1: CGPoint(x: 0, y: -80),
-                          control2: CGPoint(x: target.x, y: target.y + 60))
+                          control1: CGPoint(x: 0, y: -25),
+                          control2: CGPoint(x: target.x, y: target.y + 20))
         case "topRight":
-            path.move(to: CGPoint(x: sizeWidth / 2 + 20, y: sizeHeight / 2 - 60))
-            path.addCurve(to: CGPoint(x: -40, y: 0),
-                          control1: CGPoint(x: 40, y: sizeHeight / 4),
-                          control2: CGPoint(x: -80, y: 80))
+            path.move(to: CGPoint(x: nativeWidth / 2 + 10, y: nativeHeight / 2 - 20))
+            path.addCurve(to: CGPoint(x: -15, y: 0),
+                          control1: CGPoint(x: 15, y: nativeHeight / 4),
+                          control2: CGPoint(x: -30, y: 25))
             path.addCurve(to: target,
-                          control1: CGPoint(x: 0, y: -80),
-                          control2: CGPoint(x: target.x, y: target.y + 60))
+                          control1: CGPoint(x: 0, y: -25),
+                          control2: CGPoint(x: target.x, y: target.y + 20))
         case "leftSide":
-            path.move(to: CGPoint(x: -sizeWidth / 2 - 30, y: -60))
-            path.addCurve(to: CGPoint(x: 60, y: 80),
-                          control1: CGPoint(x: 0, y: -120),
-                          control2: CGPoint(x: 80, y: -20))
+            path.move(to: CGPoint(x: -nativeWidth / 2 - 15, y: -20))
+            path.addCurve(to: CGPoint(x: 20, y: 25),
+                          control1: CGPoint(x: 0, y: -40),
+                          control2: CGPoint(x: 25, y: -10))
             path.addCurve(to: target,
-                          control1: CGPoint(x: 40, y: 160),
-                          control2: CGPoint(x: target.x, y: target.y + 50))
+                          control1: CGPoint(x: 15, y: 50),
+                          control2: CGPoint(x: target.x, y: target.y + 20))
         default: // rightSide
-            path.move(to: CGPoint(x: sizeWidth / 2 + 30, y: -60))
-            path.addCurve(to: CGPoint(x: -60, y: 80),
-                          control1: CGPoint(x: 0, y: -120),
-                          control2: CGPoint(x: -80, y: -20))
+            path.move(to: CGPoint(x: nativeWidth / 2 + 15, y: -20))
+            path.addCurve(to: CGPoint(x: -20, y: 25),
+                          control1: CGPoint(x: 0, y: -40),
+                          control2: CGPoint(x: -25, y: -10))
             path.addCurve(to: target,
-                          control1: CGPoint(x: -40, y: 160),
-                          control2: CGPoint(x: target.x, y: target.y + 50))
+                          control1: CGPoint(x: -15, y: 50),
+                          control2: CGPoint(x: target.x, y: target.y + 20))
         }
 
         return path
@@ -756,9 +895,9 @@ class GameScene: SKScene {
     private func updateStars(dt: TimeInterval) {
         for star in stars {
             star.node.position.y -= star.speed * CGFloat(dt)
-            if star.node.position.y < -sizeHeight / 2 {
-                star.node.position.y = sizeHeight / 2
-                star.node.position.x = CGFloat.random(in: -sizeWidth / 2...sizeWidth / 2)
+            if star.node.position.y < -nativeHeight / 2 {
+                star.node.position.y = nativeHeight / 2
+                star.node.position.x = CGFloat.random(in: -nativeWidth / 2...nativeWidth / 2)
             }
         }
     }
@@ -773,7 +912,7 @@ class GameScene: SKScene {
             player.alpha = 1.0
         }
 
-        let speed: CGFloat = 260.0 * CGFloat(dt)
+        let speed: CGFloat = 90.0 * CGFloat(dt)
         if moveLeft {
             player.position.x -= speed
         }
@@ -781,10 +920,10 @@ class GameScene: SKScene {
             player.position.x += speed
         }
 
-        let limit = sizeWidth / 2 - 30
+        let limit = nativeWidth / 2 - 10
         player.position.x = max(-limit, min(limit, player.position.x))
 
-        // Firing logic (Authentic Galaga: max 2 missiles on screen at once)
+        // Firing logic (Authentic Game Boy: max 2 missiles on screen at once)
         if fireCooldown > 0 { fireCooldown -= dt }
         if isFiring && fireCooldown <= 0 && playerMissiles.count < 2 {
             firePlayerLaser()
@@ -796,7 +935,7 @@ class GameScene: SKScene {
         SoundEngine.shared.playLaser()
 
         let missile = SKSpriteNode(texture: RetroTextures.shared.playerLaser)
-        missile.position = CGPoint(x: player.position.x, y: player.position.y + 18)
+        missile.position = CGPoint(x: player.position.x, y: player.position.y + 8)
         gameLayer.addChild(missile)
         playerMissiles.append(missile)
     }
@@ -815,17 +954,16 @@ class GameScene: SKScene {
 
     private func updateFormation(dt: TimeInterval) {
         formationTime += dt * 2.2
-        let swayX = CGFloat(sin(formationTime)) * 18.0
+        let swayX = CGFloat(sin(formationTime)) * 6.0
 
         // Flapping wings animation
         wingFlapTimer += dt
-        if wingFlapTimer >= 0.3 {
+        if wingFlapTimer >= 0.25 {
             wingFlapTimer = 0
             currentWingFrame = currentWingFrame == 1 ? 2 : 1
         }
 
         for enemy in enemies {
-            // Update texture for wing flaps
             updateEnemyTexture(enemy: enemy)
 
             if enemy.state == .formation {
@@ -833,14 +971,13 @@ class GameScene: SKScene {
                 enemy.position.y = enemy.targetSlot.y
                 enemy.zRotation = 0
             } else if enemy.state == .returning {
-                // Return from top
                 let targetPos = CGPoint(x: enemy.targetSlot.x + swayX, y: enemy.targetSlot.y)
                 let dx = targetPos.x - enemy.position.x
                 let dy = targetPos.y - enemy.position.y
                 enemy.position.x += dx * CGFloat(dt) * 3.0
                 enemy.position.y += dy * CGFloat(dt) * 3.0
 
-                if hypot(dx, dy) < 8 {
+                if hypot(dx, dy) < 4 {
                     enemy.state = .formation
                     enemy.hasFired = false
                     enemy.zRotation = 0
@@ -865,51 +1002,43 @@ class GameScene: SKScene {
     }
 
     private func updateDiveBombers(dt: TimeInterval) {
-        guard waveQueue.isEmpty else { return }
-
         diveTimer += dt
-        let diveInterval = max(1.2, 2.5 - Double(stage) * 0.2)
-
-        if diveTimer >= diveInterval {
+        if diveTimer >= 2.5 {
             diveTimer = 0
-            let ready = enemies.filter { $0.state == .formation }
-            if let victim = ready.randomElement() {
-                launchDive(enemy: victim)
-            }
-        }
-
-        // Check diving enemies to fire bullets midway
-        for enemy in enemies where enemy.state == .diving {
-            if !enemy.hasFired && enemy.position.y > -50 && enemy.position.y < sizeHeight / 4 {
-                fireAlienBullet(from: enemy)
-                enemy.hasFired = true
-            }
+            triggerDiveBomb()
         }
     }
 
-    private func launchDive(enemy: EnemyNode) {
-        SoundEngine.shared.playDive()
-        enemy.state = .diving
-        enemy.hasFired = false
+    private func triggerDiveBomb() {
+        let formationEnemies = enemies.filter { $0.state == .formation }
+        guard let attacker = formationEnemies.randomElement() else { return }
 
+        attacker.state = .diving
+        attacker.hasFired = false
+        SoundEngine.shared.playDive()
+
+        executeDivePath(for: attacker)
+    }
+
+    private func executeDivePath(for enemy: EnemyNode) {
+        let path = CGMutablePath()
         let start = enemy.position
         let playerX = player.position.x
-        let sweepDir: CGFloat = start.x > 0 ? -1.0 : 1.0
+        let sweepDir: CGFloat = start.x > 0 ? -1 : 1
 
-        let path = CGMutablePath()
         path.move(to: start)
-        path.addCurve(to: CGPoint(x: playerX + sweepDir * 30, y: -sizeHeight / 4),
-                      control1: CGPoint(x: start.x + sweepDir * 40, y: start.y + 20),
-                      control2: CGPoint(x: start.x + sweepDir * 80, y: 0))
-        path.addCurve(to: CGPoint(x: -sweepDir * sizeWidth / 2, y: -sizeHeight / 2 - 50),
-                      control1: CGPoint(x: playerX - sweepDir * 20, y: -sizeHeight / 2 + 50),
-                      control2: CGPoint(x: playerX - sweepDir * 60, y: -sizeHeight / 2))
+        path.addCurve(to: CGPoint(x: playerX + sweepDir * 15, y: -nativeHeight / 4),
+                      control1: CGPoint(x: start.x + sweepDir * 20, y: start.y + 10),
+                      control2: CGPoint(x: start.x + sweepDir * 40, y: 0))
+        path.addCurve(to: CGPoint(x: -sweepDir * nativeWidth / 2, y: -nativeHeight / 2 - 20),
+                      control1: CGPoint(x: playerX - sweepDir * 10, y: -nativeHeight / 2 + 20),
+                      control2: CGPoint(x: playerX - sweepDir * 30, y: -nativeHeight / 2))
 
-        let follow = SKAction.follow(path, asOffset: false, orientToPath: true, duration: 2.8)
+        let follow = SKAction.follow(path, asOffset: false, orientToPath: true, duration: 2.2)
         let loopBack = SKAction.run { [weak self, weak enemy] in
             guard let enemy = enemy, let self = self else { return }
             enemy.state = .returning
-            enemy.position = CGPoint(x: enemy.targetSlot.x, y: self.sizeHeight / 2 + 30)
+            enemy.position = CGPoint(x: enemy.targetSlot.x, y: self.nativeHeight / 2 + 10)
             enemy.zRotation = 0
         }
 
@@ -925,7 +1054,7 @@ class GameScene: SKScene {
         let dx = player.position.x - enemy.position.x
         let dy = player.position.y - enemy.position.y
         let angle = atan2(dy, dx)
-        let speed: CGFloat = 220 + CGFloat(stage * 20)
+        let speed: CGFloat = 110 + CGFloat(stage * 10)
 
         bullet.userData = ["vx": cos(angle) * speed, "vy": sin(angle) * speed]
     }
@@ -933,8 +1062,8 @@ class GameScene: SKScene {
     private func updateProjectiles(dt: TimeInterval) {
         // Player Missiles
         for (idx, missile) in playerMissiles.enumerated().reversed() {
-            missile.position.y += 620.0 * CGFloat(dt)
-            if missile.position.y > sizeHeight / 2 + 20 {
+            missile.position.y += 180.0 * CGFloat(dt)
+            if missile.position.y > nativeHeight / 2 + 10 {
                 missile.removeFromParent()
                 playerMissiles.remove(at: idx)
             }
@@ -946,11 +1075,11 @@ class GameScene: SKScene {
                 bullet.position.x += vx * CGFloat(dt)
                 bullet.position.y += vy * CGFloat(dt)
             } else {
-                bullet.position.y -= 250.0 * CGFloat(dt)
+                bullet.position.y -= 110.0 * CGFloat(dt)
             }
 
-            if bullet.position.y < -sizeHeight / 2 - 20 || bullet.position.y > sizeHeight / 2 + 20 ||
-               bullet.position.x < -sizeWidth / 2 - 20 || bullet.position.x > sizeWidth / 2 + 20 {
+            if bullet.position.y < -nativeHeight / 2 - 10 || bullet.position.y > nativeHeight / 2 + 10 ||
+               bullet.position.x < -nativeWidth / 2 - 10 || bullet.position.x > nativeWidth / 2 + 10 {
                 bullet.removeFromParent()
                 alienBullets.remove(at: idx)
             }
@@ -961,7 +1090,7 @@ class GameScene: SKScene {
         // 1. Player Missile vs Enemies
         for (mIdx, missile) in playerMissiles.enumerated().reversed() {
             for (eIdx, enemy) in enemies.enumerated().reversed() {
-                if hypot(missile.position.x - enemy.position.x, missile.position.y - enemy.position.y) < 22 {
+                if hypot(missile.position.x - enemy.position.x, missile.position.y - enemy.position.y) < 10 {
                     missile.removeFromParent()
                     playerMissiles.remove(at: mIdx)
 
@@ -998,7 +1127,7 @@ class GameScene: SKScene {
 
         // Bullet vs Player
         for (bIdx, bullet) in alienBullets.enumerated().reversed() {
-            if hypot(bullet.position.x - player.position.x, bullet.position.y - player.position.y) < 16 {
+            if hypot(bullet.position.x - player.position.x, bullet.position.y - player.position.y) < 8 {
                 bullet.removeFromParent()
                 alienBullets.remove(at: bIdx)
                 killPlayer()
@@ -1008,7 +1137,7 @@ class GameScene: SKScene {
 
         // Enemy Ramming Player
         for (eIdx, enemy) in enemies.enumerated().reversed() {
-            if hypot(enemy.position.x - player.position.x, enemy.position.y - player.position.y) < 24 {
+            if hypot(enemy.position.x - player.position.x, enemy.position.y - player.position.y) < 12 {
                 SoundEngine.shared.playExplosion()
                 createExplosion(at: enemy.position)
                 enemy.removeFromParent()
@@ -1027,13 +1156,13 @@ class GameScene: SKScene {
         lives -= 1
         updateLifeIcons()
 
-        let delay = SKAction.wait(forDuration: 1.8)
+        let delay = SKAction.wait(forDuration: 1.5)
         let respawn = SKAction.run { [weak self] in
             guard let self = self else { return }
             if self.lives > 0 {
                 self.isPlayerDead = false
                 self.player.isHidden = false
-                self.player.position = CGPoint(x: 0, y: -self.sizeHeight / 2 + 65)
+                self.player.position = CGPoint(x: 0, y: -self.nativeHeight / 2 + 16)
                 self.invulnerableTime = 2.0
             } else {
                 self.gameOver()
@@ -1047,7 +1176,7 @@ class GameScene: SKScene {
         exp.position = position
         gameLayer.addChild(exp)
 
-        let animate = SKAction.animate(with: RetroTextures.shared.explosions, timePerFrame: 0.08)
+        let animate = SKAction.animate(with: RetroTextures.shared.explosions, timePerFrame: 0.06)
         let remove = SKAction.removeFromParent()
         exp.run(SKAction.sequence([animate, remove]))
     }
@@ -1067,7 +1196,7 @@ class GameScene: SKScene {
             messageLabel.text = "STAGE CLEARED!"
             messageLabel.isHidden = false
 
-            let wait = SKAction.wait(forDuration: 2.0)
+            let wait = SKAction.wait(forDuration: 1.8)
             let next = SKAction.run { [weak self] in
                 guard let self = self else { return }
                 self.startStage(stageNumber: self.stage + 1)
@@ -1135,6 +1264,11 @@ class GameScene: SKScene {
                 self?.startNewGame()
             }
         }
+        controller.extendedGamepad?.buttonX.valueChangedHandler = { [weak self] (button, value, pressed) in
+            if pressed {
+                self?.cycleTheme()
+            }
+        }
         controller.microGamepad?.dpad.valueChangedHandler = { [weak self] (dpad, x, y) in
             self?.moveLeft = x < -0.2
             self?.moveRight = x > 0.2
@@ -1143,6 +1277,11 @@ class GameScene: SKScene {
             self?.isFiring = pressed
             if pressed && self?.isGameOverState == true {
                 self?.startNewGame()
+            }
+        }
+        controller.microGamepad?.buttonX.valueChangedHandler = { [weak self] (button, value, pressed) in
+            if pressed {
+                self?.cycleTheme()
             }
         }
     }
@@ -1158,11 +1297,16 @@ extension GameScene {
             return
         }
 
-        isFiring = true
         if let touch = touches.first {
             let loc = touch.location(in: self)
+            // Tap top HUD to switch palettes
+            if loc.y > nativeHeight / 2 - 25 {
+                cycleTheme()
+                return
+            }
             player.position.x = loc.x
         }
+        isFiring = true
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -1179,9 +1323,11 @@ extension GameScene {
     func handleSwipe(direction: SwipeDirection) {
         switch direction {
         case .left:
-            player.position.x -= 40
+            player.position.x -= 20
         case .right:
-            player.position.x += 40
+            player.position.x += 20
+        case .up, .down:
+            cycleTheme()
         }
     }
 }
@@ -1203,6 +1349,16 @@ extension GameScene {
             moveRight = true
         case 49, 126, 36: // Spacebar, Up Arrow, Return
             isFiring = true
+        case 18: // '1' -> DMG
+            setTheme(.dmg)
+        case 19: // '2' -> Pocket
+            setTheme(.pocket)
+        case 20: // '3' -> GBC
+            setTheme(.gbc)
+        case 21: // '4' -> Arcade
+            setTheme(.arcade)
+        case 17: // 'T' -> Cycle
+            cycleTheme()
         default:
             break
         }
@@ -1225,8 +1381,12 @@ extension GameScene {
         if isGameOverState {
             startNewGame()
         } else {
-            isFiring = true
             let loc = event.location(in: self)
+            if loc.y > nativeHeight / 2 - 25 {
+                cycleTheme()
+                return
+            }
+            isFiring = true
             player.position.x = loc.x
         }
     }

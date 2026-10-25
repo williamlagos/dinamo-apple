@@ -1,0 +1,105 @@
+{
+  "system": {
+    "name": "Game Boy Handheld Architecture",
+    "resolution": {
+      "width": 160,
+      "height": 144,
+      "aspectRatio": "10:9",
+      "tilesX": 20,
+      "tilesY": 18,
+      "tileSize": 8
+    },
+    "framerate": 59.7275
+  },
+  "palettes": {
+    "dmg": {
+      "name": "Game Boy DMG (1989)",
+      "description": "Original dot-matrix pea green monochrome LCD",
+      "colors": {
+        "lightest": "#e0f8d0",
+        "light": "#88c070",
+        "dark": "#346856",
+        "darkest": "#081820"
+      },
+      "indices": [
+        "#e0f8d0",
+        "#88c070",
+        "#346856",
+        "#081820"
+      ],
+      "rgb": [
+        [224, 248, 208],
+        [136, 192, 112],
+        [52, 104, 86],
+        [8, 24, 32]
+      ]
+    },
+    "pocket": {
+      "name": "Game Boy Pocket (1996)",
+      "description": "True black & white film-compensated FSTN LCD",
+      "colors": {
+        "lightest": "#ffffff",
+        "light": "#aaaaaa",
+        "dark": "#555555",
+        "darkest": "#000000"
+      },
+      "indices": [
+        "#ffffff",
+        "#aaaaaa",
+        "#555555",
+        "#000000"
+      ],
+      "rgb": [
+        [255, 255, 255],
+        [170, 170, 170],
+        [85, 85, 85],
+        [0, 0, 0]
+      ]
+    },
+    "gbc": {
+      "name": "Game Boy Color Arcade (1998)",
+      "description": "4-color palettes per object sprite bank with tinted space background",
+      "background": "#081020",
+      "stars": [
+        "#ffffff",
+        "#f8d878",
+        "#78c8f8"
+      ],
+      "player": {
+        "lightest": "#ffffff",
+        "light": "#00e8d8",
+        "dark": "#d82800",
+        "darkest": "#000000"
+      },
+      "enemies": {
+        "drone": [
+          "#ffffff",
+          "#f8d800",
+          "#d82800",
+          "#000000"
+        ],
+        "escort": [
+          "#ffffff",
+          "#f85898",
+          "#b80040",
+          "#000000"
+        ],
+        "bee": [
+          "#ffffff",
+          "#00c8f8",
+          "#0040c8",
+          "#000000"
+        ]
+      }
+    }
+  },
+  "audio": {
+    "sampleRate": 44100,
+    "channels": {
+      "ch1": "Pulse wave with frequency sweep and volume envelope (Player laser / dive tones)",
+      "ch2": "Pulse wave with volume envelope without sweep (Secondary alerts and chimes)",
+      "ch3": "Programmable 4-bit wave channel (Basslines and arpeggios)",
+      "ch4": "7-bit / 15-bit LFSR polynomial pseudo-random noise generator (Explosions and crash bursts)"
+    }
+  }
+}

@@ -19,7 +19,7 @@ class GameViewController: NSViewController {
             // Load the GameScene
             if let scene = SKScene(fileNamed: "GameScene") {
                 // Configure the scene
-                scene.scaleMode = .resizeFill
+                scene.scaleMode = .aspectFit
                 
                 // Present the scene in the SKView
                 skView.presentScene(scene)
